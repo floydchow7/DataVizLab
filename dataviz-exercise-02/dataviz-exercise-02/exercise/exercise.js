@@ -9,6 +9,15 @@ To implement:
 
 */
 
+function isEven(value) {
+	return (value%2 === 0);
+}
+
+let arr = [1,2,3,4,5];
+const evenarr = arr.map(isEven);
+const evenarr2 = arr.filter(num => isEven(num));
+console.log(evenarr);
+console.log(evenarr2)
 
 /*
 ### multiply
@@ -18,6 +27,12 @@ To implement:
 * multiply(1,2,3,4,5) should return 120
 */
 
+function multiply(...numbers){
+	return numbers.reduce((accum, value) => accum * value, 1);
+}
+
+const result = multiply(1,2,3,4,5);
+console.log(result);
 
 /*
 ## Closures
@@ -28,7 +43,14 @@ To implement:
 * filter [0, 1, 2, 3, 4, 5, 6] by divisibleBy(3)
 */
 
+function divisibleBy(div) {
+	return function(num) {
+		return num % div === 0;
+	}
+}
 
+const divarr = [0,1,2,3,4,5,6].filter(divisibleBy(3));
+console.log(divarr);
 /*
 ### increment
 To implement:
@@ -36,6 +58,13 @@ To implement:
 * initial value is 100, step size is 2
 */
 
+function increment(inital =0){
+	return function(step = 1){
+		return inital +step;
+	}
+}
+
+console.log(increment(100)(2));
 
 /*
 ### colorCycle
@@ -45,7 +74,14 @@ colorCycle(colors=COLOR_CYCLE_DEFAULT)
 
 const COLOR_CYCLE_DEFAULT = ['red', 'green', 'magenta', 'blue'];
 
-
+function colorCycle(cor_arr = COLOR_CYCLE_DEFAULT){
+	var count = 0;
+	return function(){
+		var cor = cor_arr[count%cor_arr.length];
+		count += 1;
+		return cor;
+	}
+}
 
 const cc_r_g = colorCycle(['red', 'green']);
 // This is a way to run 10 times, see the task about `range` below.
@@ -66,10 +102,21 @@ To implement:
 * filter range(100) by divisibility by 13
 */
 
+function range(N){
+	var count = 0;
+	var nan_arr = Array.from(Array(10));
+	while(count<N){
+		nan_arr[count] = count;
+		count += 1;
+	}
+	return nan_arr;
+}
+
 console.log('range(10)', range(10));
 // Expeceted result:
 // [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
+console.log(range(100).filter(divisibleBy(13)));
 
 
 /*
@@ -80,6 +127,14 @@ To implement:
 
 */
 
+function randomInRange(min_val = 0, max_val = 100){
+	return Math.random() *(max_val - min_val) + min_val;
+}
+
+function randomArray(N, min_val=0, max_val = 100){
+	return range(N).map(randomInRange(min_val, max_val));
+}
+
 console.log('randomArray', randomArray(5, 0, 10));
 
 /*
@@ -88,6 +143,16 @@ console.log('randomArray', randomArray(5, 0, 10));
 * Create a function `countOccurrences(string)` which counts the number of occurrences of each letter in a string.
 	For example `countOccurrences("hello")` yields `{'h': 1, 'e': 1, 'l': 2, 'o': 1 }`.
 */
+
+
+function countOccurrences(string){
+	const strarr = Array.from(string);
+	const charCount = strarr.reduce((acc, char)=>{
+		acc[char] = (acc[char] || 0 ) + 1;
+		return acc;
+	}, {});
+	return charCount;
+}
 
 
 console.log(countOccurrences('hello'));
@@ -106,6 +171,11 @@ console.log(countOccurrences('hello'));
 * Visualize the results by calling `setCharacterCountingFunction(countOccurencesNormalized);` - look at `index.html`, now you should be able to count the distribution
 of characters in any text you input. You can pass a `colorCycle` with your colors as the second argument to color the bars.
 */
+function normalizeCounts(OrrObj){
+	const sum_count = OrrObj.reduce((sum, value)=> {return sum + value;},0);
+	const NorObj = OrrObj.map(value => value/sum_count);
+	return NorObj;
+}
 
 
 console.log(normalizeCounts(countOccurrences('hello')));
@@ -113,6 +183,11 @@ console.log(normalizeCounts(countOccurrences('hello')));
 // normalizeCounts({'h': 1, 'e': 1, 'l': 2, 'o': 1 }) ---> {'h': 0.2, 'e': 0.2, 'l': 0.4, 'o': 0.2 }
 
 
+function countOccurencesNormalized(string){
+	return normalizeCounts(countOccurrences(string));
+}
+
+console.log(countOccurencesNormalized('hello'));
 /*
 ## Throwing balls
 
@@ -146,8 +221,20 @@ Use the `range` function to create the array of time points, then `map` them to 
 
 const DEG_TO_RAD = Math.PI / 180.;
 
+function simulateBall(v0, angle, num_steps=256, dt=0.05, g=-9.81){
+	const vx = v0 * Math.cos(angle * DEG_TO_RAD);
+	const vy = v0 * Math.sin(angle *DEG_TO_RAD);
+	const timearr = range(N).map(t=>t*dt);
+	return timearr.map(t =>[vx*t, vy*t*t*0.5]).filter(loc => loc[1]>=0);
+}
+
 
 const ball_cc = colorCycle(['hsl(160, 100%, 64%)', 'hsl(200, 100%, 64%)', 'hsl(240, 100%, 64%)', 'hsl(120, 100%, 64%)', 'hsl(80, 100%, 64%)']);
 plotBall(simulateBall(40, 60), ball_cc());
 plotBall(simulateBall(40, 30), ball_cc());
 plotBall(simulateBall(40, 45), ball_cc());
+
+ran_ang = randomArray(20, 0, 90);
+for (ang in ran_ang){
+	plotBall(simulateBall(40, ang), ball_cc());
+}
